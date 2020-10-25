@@ -4,6 +4,10 @@
 #include <map>
 #include <cmath>
 
+// TO DO:
+//reset dictionary
+//sTsTs decoding
+//fix reading the end bytes
 void LWZDecompressor::Decompress(std::istream &input, std::ostream &output) {
   if (input.fail()) {
     std::cout << "Error opening the input file" << std::endl;
@@ -14,7 +18,7 @@ void LWZDecompressor::Decompress(std::istream &input, std::ostream &output) {
     return;
   }
   std::map<int, std::string> dictionary;
-  for (int i = 1; i <= 256; i++) {
+  for (int i = 0; i < 256; i++) {
     dictionary[i] = i;
   }
   int dictionarySize = 256; //1 byte
@@ -37,31 +41,24 @@ void LWZDecompressor::Decompress(std::istream &input, std::ostream &output) {
     }
     if (dictionary.count(code) > 0) { //
       output << dictionary[code];
-      std::cout << dictionary[code];
+//      std::cout << dictionary[code];
       w += dictionary[code].at(0);
-      std::cout << " add new to dict " << dictionarySize + 1 << ": " << w << std::endl;
+//      std::cout << "  got:" << code << ", add new to dict " << dictionarySize << ": " << w << std::endl;
       if (first) {
         first = false;
       } else {
-        if (++dictionarySize == maxDictSize) {
-          dictionarySize = 257; //Initial size + 1
+        if (dictionarySize == maxDictSize) {
+          dictionarySize = 256; //Initial size + 1
         }
         dictionary[dictionarySize] = w;
+        dictionarySize++;
       }
       w = dictionary[code];
     } else if (code == dictionarySize) {
       std::cout << " code == dictionarySize" << std::endl;
     } else {
+//      std::cout << "aaaaam  got:" << code << ", add new to dict " << dictionarySize << ": " << w << std::endl;
       std::cout << " code > dictionarySize" << std::endl;
     }
   }
-//  int byte1 = input.get();
-//  int byte2 = input.get();
-//  int test1 = 1;
-//  int byte2real = byte2 >> 4;
-//  int code = (byte1 << 4) + byte2real;
-//  std::cout << byte1 << " and " << byte2 << std::endl;
-//  std::cout << "byte2 code part : " << byte2real << std::endl;
-//  std::cout << "CODE : " << char(code) << std::endl;
-//  output << char(code);
 }
