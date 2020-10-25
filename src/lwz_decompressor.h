@@ -1,5 +1,6 @@
 #ifndef LZW_DECOMPRESSOR_SRC_LWZ_DECOMPRESSOR_H_
 #define LZW_DECOMPRESSOR_SRC_LWZ_DECOMPRESSOR_H_
+#include <iostream>
 
 class LWZDecompressor {
  public:
