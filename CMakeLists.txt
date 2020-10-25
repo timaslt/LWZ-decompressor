@@ -3,4 +3,4 @@ project(LZW_decompressor)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(LZW_decompressor main.cpp)
+add_executable(LZW_decompressor src/main.cpp)
