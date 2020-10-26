@@ -7,14 +7,13 @@
 // TO DO:
 //reset dictionary
 //sTsTs decoding
-//fix reading the end bytes
 void LWZDecompressor::Decompress(std::istream &input, std::ostream &output) {
   if (input.fail()) {
-    std::cout << "Error opening the input file" << std::endl;
+    std::cout << "Error with input." << std::endl;
     return;
   }
   if (output.fail()) {
-    std::cout << "Error opening the output file" << std::endl;
+    std::cout << "Error with output." << std::endl;
     return;
   }
   std::map<int, std::string> dictionary;
@@ -24,28 +23,41 @@ void LWZDecompressor::Decompress(std::istream &input, std::ostream &output) {
   int dictionarySize = 256; //1 byte
   int maxDictSize = dictionarySize * pow(2, 4); //4 bits are left to extend the dictionary
   bool evenPos = true;
-  bool first = true;
+  bool isFirstCode = true;
   std::string w = "";
-  while (!input.eof()) {
+  while (input.peek() != EOF) {
     int code;
     if (evenPos) {
+//      std::cout << "even ";
       int c1 = input.get();
-      int c2 = input.peek();
-      code = (c1 << 4) + (c2 >> 4);
-      evenPos = false;
-    } else {
-      int c1 = input.get();
+      if (input.peek() == EOF) {
+        std::cout << "STOP c1 " << c1 << " kk" << std::endl;
+      }
       int c2 = input.get();
-      code = ((c1 & 15) << 8) + c2; // 15d = 00001111b
+      if (input.peek() != EOF) {
+        code = (c1 << 4) + (c2 >> 4);
+        input.seekg(-1, std::ios::cur); //Shifting pointer back by 1 char.
+        evenPos = false;
+      } else {
+        code = ((c1 & 15) << 8) + c2; // 15 = 0b00001111
+      }
+
+    } else {
+//      std::cout << "odd ";
+      int c1 = input.get();
+      if (input.peek() == EOF) {
+        std::cout << "STOP c1 " << c1 << " kk" << std::endl;
+      }
+      int c2 = input.get();
+      code = ((c1 & 15) << 8) + c2; // 15 = 0b00001111
       evenPos = true;
     }
     if (dictionary.count(code) > 0) { //
       output << dictionary[code];
-//      std::cout << dictionary[code];
       w += dictionary[code].at(0);
-//      std::cout << "  got:" << code << ", add new to dict " << dictionarySize << ": " << w << std::endl;
-      if (first) {
-        first = false;
+//      std::cout << dictionary[code] << "  got:" << code << ", add new to dict " << dictionarySize << ": " << w << std::endl;
+      if (isFirstCode) {
+        isFirstCode = false;
       } else {
         if (dictionarySize == maxDictSize) {
           dictionarySize = 256; //Initial size + 1
@@ -57,7 +69,7 @@ void LWZDecompressor::Decompress(std::istream &input, std::ostream &output) {
     } else if (code == dictionarySize) {
       std::cout << " code == dictionarySize" << std::endl;
     } else {
-//      std::cout << "aaaaam  got:" << code << ", add new to dict " << dictionarySize << ": " << w << std::endl;
+      std::cout << "aaaaam  got:" << code << ", add new to dict " << dictionarySize << ": " << w << std::endl;
       std::cout << " code > dictionarySize" << std::endl;
     }
   }
