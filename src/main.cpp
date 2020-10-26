@@ -3,12 +3,15 @@
 #include "lwz_decompressor.h"
 
 int main() {
-  std::ifstream compFile("../compressed/compressedfile1.z", std::ios::binary);
-  std::ofstream decompFile("../decompressed/decompressedfile1.txt");
   LWZDecompressor lwzDecoder;
-  lwzDecoder.Decompress(compFile, decompFile);
-  compFile.close();
-  decompFile.close();
-  std::cout << "Hello, World!" << std::endl;
+  for (int i = 1; i <= 4; i++) {
+    std::string comp_file_path = std::string("../compressed/compressedfile") + std::to_string(i) + std::string(".z");
+    std::string decomp_file_path = std::string("../decompressed/decompressedfile") + std::to_string(i) + std::string(".txt");
+    std::ifstream comp_file(comp_file_path, std::ios::binary);
+    std::ofstream decomp_file(decomp_file_path);
+    lwzDecoder.Decompress(comp_file, decomp_file);
+    comp_file.close();
+    decomp_file.close();
+  }
   return 0;
 }
