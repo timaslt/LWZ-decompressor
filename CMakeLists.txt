@@ -6,3 +6,5 @@ set(CMAKE_CXX_STANDARD 14)
 set(SOURCE_FILES src/main.cpp src/lwz_decompressor.h src/lwz_decompressor.cpp)
 
 add_executable(LZW_decompressor ${SOURCE_FILES})
+
+add_library(lwz_decompressor STATIC src/lwz_decompressor.cpp)
